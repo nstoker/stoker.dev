@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/nstoker/stoker.dev/pkg/version"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	fmt.Printf("Hello, from version %s", version.Version())
+	log.Infof("Starting up %s", version.Version())
 }

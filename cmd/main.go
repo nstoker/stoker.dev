@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/nstoker/stoker.dev/pkg/version"
+)
 
 func main() {
-	fmt.Println("Hello")
+	fmt.Printf("Hello, from version %s", version.Version())
 }

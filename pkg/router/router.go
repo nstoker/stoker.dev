@@ -13,12 +13,15 @@ import (
 
 var (
 	r   *mux.Router
+	api *mux.Router
 )
 
 func init() {
 	logrus.Infof("Initializing router")
 	r = mux.NewRouter()
+	api = r.PathPrefix("/api").Subrouter()
 	defaultRoutes(r)
+	defaultAPIRoutes(api)
 }
 
 func GetRouter() (*mux.Router, error) {
@@ -31,6 +34,10 @@ func GetRouter() (*mux.Router, error) {
 
 func defaultRoutes(r *mux.Router) {
 	homepage.ConnectToRouter(r, "/", "static", "index.html")
+}
+
+func defaultAPIRoutes(r *mux.Router) {
+	health.Routes(r)
 }
 
 func Run(address string) error {

@@ -20,8 +20,10 @@ func init() {
 	logrus.Infof("Initializing router")
 	r = mux.NewRouter()
 	api = r.PathPrefix("/api").Subrouter()
-	defaultRoutes(r)
 	defaultAPIRoutes(api)
+
+	// Default routes come last
+	homepage.ConnectToRouter(r, "/", "static", "index.html")
 }
 
 func GetRouter() (*mux.Router, error) {
@@ -30,10 +32,6 @@ func GetRouter() (*mux.Router, error) {
 	}
 
 	return r, nil
-}
-
-func defaultRoutes(r *mux.Router) {
-	homepage.ConnectToRouter(r, "/", "static", "index.html")
 }
 
 func defaultAPIRoutes(r *mux.Router) {

@@ -19,6 +19,7 @@ var (
 func init() {
 	logrus.Infof("Initializing router")
 	r = mux.NewRouter()
+	r.StrictSlash(true)
 	api = r.PathPrefix("/api").Subrouter()
 	defaultAPIRoutes(api)
 

@@ -1,9 +1,12 @@
 package health
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/nstoker/stoker.dev/pkg/version"
 )
 
 func TestHealthCheckHandler(t *testing.T) {
@@ -28,10 +31,22 @@ func TestHealthCheckHandler(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
-	expected := `{"Alive":true,"Version":"v0.0.0"}`
-	if rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
+	var got HealthCheckStruct
+	err = json.Unmarshal(rr.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatalf("failed to unmarshal %v", err)
 	}
+
+	expected := HealthCheckStruct{
+		Alive:   true,
+		Version: version.Version(),
+	}
+
+	if got.Alive != expected.Alive {
+		t.Errorf("unexpected reponse for alive. Got %v - expected %v", got.Alive, expected.Alive)
+	}
+	if got.Version != expected.Version {
+		t.Errorf("Unexpected response for version. Got '%s' - expected '%s'", got.Version, expected.Version)
+	}
+
 }

@@ -25,6 +25,8 @@ func init() {
 
 	// Default routes come last
 	homepage.ConnectToRouter(r, "/", "static", "index.html")
+
+	r.Use(loggingMiddleware)
 }
 
 func GetRouter() (*mux.Router, error) {
@@ -48,4 +50,13 @@ func Run(address string) error {
 	}
 
 	return srv.ListenAndServe()
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Do stuff here
+		logrus.Println(r.RequestURI)
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
 }

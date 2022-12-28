@@ -3,8 +3,10 @@ package router
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/nstoker/stoker.dev/pkg/health"
 	homepage "github.com/nstoker/stoker.dev/pkg/homesite"
@@ -26,7 +28,7 @@ func init() {
 	// Default routes come last
 	homepage.ConnectToRouter(r, "/", "static", "index.html")
 
-	r.Use(loggingMiddleware)
+	r.Use(logging)
 }
 
 func GetRouter() (*mux.Router, error) {
@@ -43,7 +45,7 @@ func defaultAPIRoutes(r *mux.Router) {
 
 func Run(address string) error {
 	srv := &http.Server{
-		Handler:      r,
+		Handler:      handlers.CompressHandler(r),
 		Addr:         address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -52,11 +54,15 @@ func Run(address string) error {
 	return srv.ListenAndServe()
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Do stuff here
-		logrus.Println(r.RequestURI)
-		// Call the next handler, which can be another middleware in the chain, or the final handler.
-		next.ServeHTTP(w, r)
-	})
+// func loggingMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		// Do stuff here
+// 		logrus.Println(r.RequestURI)
+// 		// Call the next handler, which can be another middleware in the chain, or the final handler.
+// 		next.ServeHTTP(w, r)
+// 	})
+// }
+
+func logging(handler http.Handler) http.Handler {
+	return handlers.CombinedLoggingHandler(os.Stdout, handler)
 }
